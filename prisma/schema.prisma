@@ -1,0 +1,100 @@
+model User {
+  id         String   @id @default(uuid())
+  name       String
+  email      String   @unique
+  password   String
+  role       UserRole
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @default(now()) @updatedAt @map("updated_at")
+}
+
+model Webhook {
+  id          String   @id @default(uuid())
+  name        String
+  accessToken String   @map("access_token")
+  targetUrl   String   @map("targeturl")
+  resource    String
+  event       String
+  filter      String?
+  secret      String?
+  webhookId   String?  @map("webhook_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at")
+}
+
+model WebhookLog {
+  id         String   @id @default(uuid())
+  webhookId  String?
+  payload    Json
+  status     String
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@index([webhookId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+enum UserRole {
+  agent
+  supervisor
+  admin
+}
+
+model ChatMessage {
+  id        String   @id @default(uuid())
+  messageId String   @unique
+  roomId    String
+  personId  String
+  content   String
+  createdAt DateTime @map("created_at")
+  
+  @@index([roomId])
+  @@index([personId])
+}
+
+model ChatRequest {
+  id           String   @id @default(uuid())
+  roomId       String   @unique
+  personEmail  String
+  status       String   @default("unassigned")
+  latestMessage String?
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @default(now()) @updatedAt @map("updated_at")
+}
+
+model Space {
+  id           String   @id @default(uuid())
+  roomId       String   @unique
+  title        String
+  type         String
+  created      DateTime
+  lastActivity DateTime
+}
+
+model SpaceMember {
+  id           String   @id @default(uuid())
+  membershipId String   @unique
+  personId     String
+  personEmail  String
+  roomId       String
+  isModerator  Boolean  @default(false)
+  created      DateTime
+  
+  @@index([roomId])
+  @@index([personId])
+}
+
+model CardAction {
+  id        String   @id @default(uuid())
+  actionId  String   @unique
+  type      String
+  messageId String
+  inputs    Json
+  personId  String
+  roomId    String
+  createdAt DateTime @map("created_at")
+  
+  @@index([messageId])
+  @@index([personId])
+}
